@@ -200,6 +200,7 @@ below_average_condition <- df[df$OverallCond < 5, ]
 above_average_condition <- df[df$OverallCond > 5, ]
 average_condition <- df[df$OverallCond == 5, ]
 
+library(scales)
 
 
 # Calculate the range of SalePrice
