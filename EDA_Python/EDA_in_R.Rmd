@@ -1,5 +1,5 @@
 ---
-title: "311 RDA"
+title: "311 EDA"
 author: "Ana Paula Felix de Queiroz"
 output:
   word_document: default
@@ -38,7 +38,10 @@ library(car)
 
 ```
 
-##### [Import the data]{style="color:#2a6592"}:
+
+## 1. Load the Dataset In R
+
+
 
 ```{r}
 # Set the working directory to the folder containing the CSV file
@@ -49,10 +52,28 @@ ames <- read.csv("ames.csv")
 
 # Verify if the data was loaded correctly
 head(ames)
+```
+
+
+Inspect the contents of the dataframe:
+
+```{r}
+
 
 str(ames)
 dim(ames)
 ```
+
+
+## 2. Explore Data Distributions
+
+Write code to produce histograms showing the distributions of `SalePrice`, `TotRmsAbvGrd`, and `OverallCond`.
+
+
+
+### Sale Price
+
+In the cell below, produce a histogram for `SalePrice`.
 
 ```{r}
 
@@ -63,16 +84,264 @@ df = ames
 data <- df$SalePrice
 mean <- mean(data)
 
+
+
+
 # Set up plot
-hist(data, main = "Distribution of Sale Prices", xlab = "Sale Price", ylab = "Number of Houses", col = "lightblue", border = "black")
+hist(data, main = "Distribution of Sale Prices", xlab = "Sale Price", ylab = "Number of Houses", col = "lightblue", border = "black", breaks = 80)
 
 # Add vertical line
 abline(v = mean, col = "black", lwd = 2)
-
-
-mean(data)
-
-median(data)
-
-sd(data)
 ```
+
+
+
+Now, print out the mean, median, and standard deviation:
+
+```{r}
+
+mean = mean(data)
+
+median = median(data)
+
+ sd = sd(data)
+ 
+ print(paste("Mean:", mean))
+  print(paste("Median:", median))
+print(paste("Standard Deviation:", sd))
+```
+### Total Rooms Above Grade
+
+In the cell below, produce a histogram for `TotRmsAbvGrd`.
+
+```{r}
+
+# Extract the relevant data
+data <- df$TotRmsAbvGrd
+
+mean <- mean(data)
+
+# Set up plot
+hist(data, main = "Distribution of Sale Prices", xlab = "Sale Price", ylab = "Number of Houses", col = "lightblue", border = "black", breaks = 80)
+
+# Add vertical line
+abline(v = mean, col = "black", lwd = 2)
+```
+
+
+Now, print out the mean, median, and standard deviation:
+
+```{r}
+
+mean = mean(data)
+
+median = median(data)
+
+ sd = sd(data)
+ 
+ print(paste("Mean:", mean))
+  print(paste("Median:", median))
+print(paste("Standard Deviation:", sd))
+
+
+```
+
+### Overall Condition
+
+In the cell below, produce a histogram for `OverallCond`.
+
+
+
+```{r}
+
+# Extract the relevant data
+data <- df$OverallCond
+mean <- mean(data)
+
+# Set up plot
+hist(data, main = "Distribution of Sale Prices", xlab = "Sale Price", ylab = "Number of Houses", col = "lightblue", border = "black", breaks = 80)
+
+# Add vertical line
+abline(v = mean, col = "black", lwd = 2)
+```
+
+Now, print out the mean, median, and standard deviation:
+```{r}
+
+mean = mean(data)
+
+median = median(data)
+
+ sd = sd(data)
+ 
+ 
+ print(paste("Mean:", mean))
+  print(paste("Median:", median))
+print(paste("Standard Deviation:", sd))
+
+
+
+```
+
+## 3. Explore Differences between Subsets
+
+As you might have noted in the previous step, the overall condition of the house seems like we should treat it as more of a categorical variable, rather than a numeric variable.
+
+One useful way to explore a categorical variable is to create subsets of the full dataset based on that categorical variable, then plot their distributions based on some other variable. Since this dataset is traditionally used for predicting the sale price of a house, let's use `SalePrice` as that other variable.
+
+In the cell below, create three variables, each of which represents a record-wise subset of `df` (meaning, it has the same columns as `df`, but only some of the rows).
+
+-   `below_average_condition`: home sales where the overall condition was less than 5
+-   `average_condition`: home sales where the overall condition was exactly 5
+-   `above_average_condition`: home sales where the overall condition was greater than 5
+
+```{r}
+below_average_condition <- df[df$OverallCond < 5, ]
+above_average_condition <- df[df$OverallCond > 5, ]
+average_condition <- df[df$OverallCond == 5, ]
+
+
+
+# Calculate the range of SalePrice
+price_range <- range(c(above_average_condition$SalePrice, average_condition$SalePrice, below_average_condition$SalePrice))
+
+# Create custom bins
+bins <- seq(price_range[1], price_range[2], length.out = 80)  # Adjust the length.out as needed
+
+# Set up plot
+par(mfrow = c(1, 1), mar = c(4, 4, 2, 2))
+plot.new()
+plot.window(xlim = price_range, ylim = c(0, 70), xlab = "Sale Price", ylab = "Number of Houses")
+title(main = "Distributions of Sale Price Grouped by Condition")
+
+# Plot histograms
+hist(above_average_condition$SalePrice, breaks = bins, col = "cyan", alpha = 0.5, add = TRUE)
+
+hist(average_condition$SalePrice, breaks = bins, col = "gray", alpha = 0.3, add = TRUE)
+hist(below_average_condition$SalePrice, breaks = bins, col = "yellow", alpha = 0.5, add = TRUE)
+
+# Add legend with transparency
+legend("topright", legend = c("above average condition", "average condition", "below average condition"),
+       fill = c(alpha("cyan", 0.5), alpha("gray", 0.3), alpha("yellow", 0.5)), density = c(0, 0, 0))
+
+# Customize labels
+axis(1)
+axis(2)
+
+
+```
+
+
+## 4. Explore Correlations
+
+To understand more about what features of these homes lead to higher sale prices, let's look at some correlations. We'll return to using the full `df`, rather than the subsets.
+
+In the cell below, print out both the name of the column and the Pearson correlation for the column that is ***most positively correlated*** with `SalePrice` (other than `SalePrice`, which is perfectly correlated with itself).
+
+We'll only check the correlations with some kind of numeric data type.
+
+You can import additional libraries, although it is possible to do this just using pandas.
+
+
+
+```{r}
+# Load required libraries
+library(dplyr)
+library(Hmisc)
+
+# Create a data frame that contains only numeric columns
+numeric_df <- df %>% select_if(is.numeric) %>% select(-SalePrice, -Id)
+
+correlations <- vector("numeric")
+
+for (col in colnames(numeric_df)) {
+  corr <- rcorr(df[[col]], df$SalePrice)$r[1, 2]
+  correlations <- c(correlations, corr)
+}
+
+max_corr_value <- max(correlations)
+max_corr_column <- colnames(numeric_df)[which(correlations == max_corr_value)]
+
+cat("Most Positively Correlated Column:", max_corr_column, "\n")
+cat("Maximum Correlation Value:", max_corr_value, "\n")
+
+
+
+
+min_corr_value <- min(correlations)
+min_corr_column <- colnames(numeric_df)[which(correlations == min_corr_value)]
+
+cat("Most Negativelly Correlated Column:", min_corr_column, "\n")
+cat("Minimun Correlation Value:", min_corr_value, "\n")
+
+
+
+```
+
+Once you have your answer, edit the code below so that it produces a scatter plot of the relevant columns.
+
+```{r}
+
+
+library(ggplot2)
+library(gridExtra)
+
+# Convert x-axis variables to factors
+df$OverallQual <- as.factor(df$OverallQual)
+df$KitchenAbvGr <- as.factor(df$KitchenAbvGr)
+
+# Define color palette
+colors <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2",
+            "#D55E00", "#CC79A7", "#999999", "#009999", "#66CCFF")
+
+# Plot distribution of column with highest correlation
+p1 <- ggplot(df, aes(x = OverallQual, y = SalePrice, fill = OverallQual)) +
+  geom_boxplot() +
+  scale_fill_manual(values = colors, breaks = levels(df$OverallQual)) +
+  labs(title = "Overall Quality vs. Sale Price",
+       x = "Overall Quality",
+       y = "Sale Price")
+
+# Plot distribution of column with most negative correlation
+p2 <- ggplot(df, aes(x = KitchenAbvGr, y = SalePrice, fill = KitchenAbvGr)) +
+  geom_boxplot() +
+  scale_fill_manual(values = colors, breaks = levels(df$KitchenAbvGr)) +
+  labs(title = "Number of Kitchens vs. Sale Price",
+       x = "Number of Kitchens Above Ground",
+       y = "Sale Price")
+
+# Arrange the plots side by side
+grid.arrange(p1, p2, ncol = 2)
+
+```
+
+
+## 5. Engineer and Explore a New Feature
+
+Here the code is written for you, all you need to do is interpret it.
+
+We note that the data spans across several years of sales:
+
+
+```{r}
+table(df$YrSold)
+
+```
+
+Maybe we can learn something interesting from the age of the home when it was sold. This uses information from the YrBuilt and YrSold columns, but represents a truly distinct feature.
+
+
+```{r}
+# Make a new column, Age
+df$Age <- df$YrSold - df$YearBuilt
+
+# Set up plot
+library(ggplot2)
+ggplot(df, aes(x = Age, y = SalePrice)) +
+  geom_point(alpha = 0.3, color = "darkgreen") +
+  labs(title = "Home Age vs. Sale Price",
+       x = "Age of Home at Time of Sale",
+       y = "Sale Price")
+
+```
+
