@@ -1,0 +1,78 @@
+---
+title: "311 RDA"
+author: "Ana Paula Felix de Queiroz"
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+editor_options:
+  chunk_output_type: console
+---
+
+```{=html}
+<style type="text/css">
+
+h1.title {
+  font-size: 38px;
+  font-family: "Times New Roman", Times, serif;
+  color: #2a6592;
+  text-align: center;
+}
+h4.author { /* Header 4 - and the author and data headers use this too  */
+    font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: #2a6592;
+  text-align: center;
+}
+h4.date { /* Header 4 - and the author and data headers use this too  */
+  font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkBlue;
+  text-align: center;
+}
+</style>
+```
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(car)
+
+```
+
+##### [Import the data]{style="color:#2a6592"}:
+
+```{r}
+# Set the working directory to the folder containing the CSV file
+setwd("C:/Users/pauli/OneDrive/Área de Trabalho/git_repo/DS311-EDA/EDA_Python/data")
+
+# Read the CSV file into a data frame
+ames <- read.csv("ames.csv")
+
+# Verify if the data was loaded correctly
+head(ames)
+
+str(ames)
+dim(ames)
+```
+
+```{r}
+
+
+df = ames
+
+# Extract the relevant data
+data <- df$SalePrice
+mean <- mean(data)
+
+# Set up plot
+hist(data, main = "Distribution of Sale Prices", xlab = "Sale Price", ylab = "Number of Houses", col = "lightblue", border = "black")
+
+# Add vertical line
+abline(v = mean, col = "black", lwd = 2)
+
+
+mean(data)
+
+median(data)
+
+sd(data)
+```
